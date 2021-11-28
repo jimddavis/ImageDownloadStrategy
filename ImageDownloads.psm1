@@ -437,9 +437,11 @@ class OutdoorPhotographer : DownloadType {
 
   }
 
-  OutdoorPhotographer ([OutdoorPhotoFeedEnum] $feedType) : base('OutdoorPhotographer') {
+  OutdoorPhotographer ([OutdoorPhotoFeedEnum] $feedType, [string] $downloadFolder) : base('OutdoorPhotographer') {
 
     $this.FeedType = $FeedType
+    $this.DownloadFolder = $downloadFolder
+
     switch ($FeedType) {
       'FavoritePlaces'  { $this.RSSFeed = 'https://www.outdoorphotographer.com/on-location/favorite-places/feed/' }
       'FeaturedStories' { $this.RSSFeed = 'https://www.outdoorphotographer.com/on-location/featured-stories/feed/' }
@@ -464,7 +466,9 @@ class OutdoorPhotographer : DownloadType {
   #>
   [void] Invoke ([ImageDownload] $D) {
 
-    Write-VerboseColored 'Starting download of Outdoor Photography Feed' DarkMagenta
+    $feed = $this.RSSFeed
+
+    Write-VerboseColored "Starting download of Outdoor Photography Feed $feed" DarkMagenta
 
     if ($this.DownloadFolder -ne $null) { $D.downloadInfo.DownloadFolder = $this.DownloadFolder }
     if ($this.TempFolder -ne $null) { $D.downloadInfo.TempFolder = $this.TempFolder }
