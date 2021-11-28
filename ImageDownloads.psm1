@@ -471,6 +471,7 @@ class OutdoorPhotographer : DownloadType {
 
     Write-VerboseColored "Starting download of Outdoor Photography Feed $feed" DarkMagenta
 
+    #If folders set in this class, update downloadInfo to those values.  Otherwise use defaults.
     if ($this.DownloadFolder -ne $null) { $D.downloadInfo.DownloadFolder = $this.DownloadFolder }
     if ($this.TempFolder -ne $null) { $D.downloadInfo.TempFolder = $this.TempFolder }
     $D.downloadInfo.FeedURL = $this.RSSFeed
