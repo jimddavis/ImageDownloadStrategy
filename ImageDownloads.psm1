@@ -1,12 +1,16 @@
 using module .\WriteErrorLog.ps1
 using module .\Write-VerboseColored.psm1
 
+
+# RSS Feeds available from https://www.outdoorphotographer.com/rss-feeds/
+# Used in OutdoorPhotographer constructor
 enum OutdoorPhotoFeedEnum {
   FavoritePlaces  = 1
   FeaturedStories = 2
   Travel          = 3
 }
 
+# Rich results information and data structure used by ImageDownload class
 class DownloadInfo {
 
   [string]   $FeedName
@@ -22,10 +26,10 @@ class DownloadInfo {
   [timespan] $ElapsedTime
 
   <#
-      Feeds can have multiple images to download, and each one needs a new copy
-      of the DownloadInfo class. This creates a copy of the existing object,
-      then sets $downloadInfo to the new version.  This way the Results array
-      gets a new instance for each image.
+     Feeds can have multiple images to download, and each one needs a new copy
+     of the DownloadInfo class. This creates a copy of the existing object,
+     then sets $downloadInfo to the new version.  This way the Results array
+     gets a new instance for each image.
   #>
   [DownloadInfo] Clone() {
 
@@ -46,7 +50,7 @@ class DownloadInfo {
   }
 }
 
-# Base class for different download feeds
+# Base class for different download feeds.  Implements the Strategy interface of strategy pattern
 class DownloadType  {
 
   [string] $Name
@@ -62,6 +66,7 @@ class DownloadType  {
 
 }
 
+# Main class.  The "Context" class of the Strategy pattern.
 class ImageDownload {
 
   hidden [string] $DEFAULT_TEMP_FOLDER = 'c:\temp'
@@ -142,6 +147,7 @@ class ImageDownload {
 
     # Only download the image if it is not already in the destination folder
     if ((Test-Path "$destFolder\$imgName")) {
+      Write-VerboseColored "Image $imgName already exists."  DarkCyan
       $this.downloadInfo.Success = $false
       $this.downloadInfo.StatusMsg = "File $imgName already exists"
       $this.SetImageFileSize()
@@ -232,6 +238,7 @@ class ImageDownload {
   }
 }
 
+# Concrete Stategy class for downloading from NASA Astronomy Picture of the Day Open API
 class NasaAPOD : DownloadType {
 
   [string] $NasaApiKey = 'DEMO_KEY'
@@ -301,7 +308,7 @@ class NasaAPOD : DownloadType {
   }
 }
 
-
+# Concrete Stategy class for downloading from Earth Observatory Image of the Day RSS Feed
 class EarthObservatoryPOD : DownloadType {
 
   $RSSFeed = "https://earthobservatory.nasa.gov/feeds/image-of-the-day.rss"
@@ -409,18 +416,12 @@ class EarthObservatoryPOD : DownloadType {
   }
 }
 
-
-
-
+# Concrete Stategy class for downloading from Outdoor Photographer RSS Feeds
 class OutdoorPhotographer : DownloadType {
 
   $RSSFeed = 'https://www.outdoorphotographer.com/on-location/favorite-places/feed/'
   [string] $DownloadFolder
   [string] $TempFolder
-
-  [OutdoorPhotoFeedEnum] $FeedType
-
-
 
   #region Constructors
   OutdoorPhotographer () : base('OutdoorPhotographer') {  }
@@ -440,7 +441,6 @@ class OutdoorPhotographer : DownloadType {
 
   OutdoorPhotographer ([OutdoorPhotoFeedEnum] $feedType, [string] $downloadFolder) : base('OutdoorPhotographer') {
 
-    $this.FeedType = $FeedType
     $this.DownloadFolder = $downloadFolder
 
     switch ($FeedType) {
@@ -499,7 +499,6 @@ class OutdoorPhotographer : DownloadType {
     foreach (  $match In $matches) {
       $url = $match.Matches.Value
       $url = $url.Substring(0, $url.IndexOf('"'))
-      Write-Host "Do Something with URL =  $url" -ForegroundColor GREEN
       $D.downloadInfo.ImgURL = $url
       $D.DownloadImageFromURL()
 
