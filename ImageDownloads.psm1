@@ -46,6 +46,7 @@ class DownloadInfo {
   }
 }
 
+# Base class for different download feeds
 class DownloadType  {
 
   [string] $Name
@@ -480,6 +481,7 @@ class OutdoorPhotographer : DownloadType {
     try {
       if (!(Test-Path $D.downloadInfo.TempFolder)) { mkdir $D.downloadInfo.TempFolder }
       Invoke-RestMethod -Uri $this.RSSFeed -OutFile $outFile
+
     }
     catch {
       Write-VerboseColored 'An error occured downloading the Outdoor Photography RSS Feed' Red
@@ -487,48 +489,18 @@ class OutdoorPhotographer : DownloadType {
       return
     }
 
-    [xml]$resp = Get-Content -Path $outFile
-    $imgURLS = $resp.SelectNodes('//item/description')
+    # Trying to match ending just .jpg pulls too much. Matching .jpg" gets the url, but with a " at
+    # the end that must be stripped.
+    #  https://cdn2.outdoorphotographer.com/2021/10/bear-rocks-preserve-west-virginia-kent-mason.jpg"
+    $regex = '(?<=src=")(.*).jpg"'
+    $matches = Select-String -Path $outFile -Pattern $regex -AllMatches
 
-    for ($i = 0; $i -lt $imgURLS.Count; $i++) {
-      Write-VerboseColored "Processing <description> Element # $i" Green
-      $zz = $imgURLS[$i]
-      $content = $zz.InnerText
-
-      # Wrap the InnerText, which is html, in <xml> tags so it is well formed xml.
-      $content = '<xml>' + $content + '</xml>'
-
-      try {
-        # Load the extracted text into an xml object and get the img node.
-        # In this feed there is only one in the <description> element.
-        [xml]$desc = $content
-        $img = $desc.SelectNodes('//img')
-        $D.downloadInfo.ImgURL = [String]$img.src
-        $D.DownloadImageFromURL()
-      }
-      catch {
-        # Errors here are almost alway bad xml in the CDATA
-        # Errors caught in $D.DownloadImageFromURL() are logged there
-        if ( ($_.Exception.InnerException.InnerException -ne $null) -and ($_.Exception.InnerException.InnerException.GetType().Name -eq 'XMLException') ) {
-          Write-Verbose 'XML Parsing error loading CDATA html into XMLReader.  Skipping this <description> element'
-          $exp = $_.Exception.InnerException.InnerException
-          $msg = "XMLException: " + $exp.Message
-          try {
-            throw ( New-Object System.Exception( $msg , $exp ) )
-          }
-          catch {
-            $D.LogError($_)
-            $D.downloadInfo.Success = $false
-            $D.downloadInfo.StatusMsg = 'XML Parsing error loading CDATA html into XMLReader.  Skipping this <description> element'
-          }
-        }
-      }
-      finally {
-        $D.downloadInfo.ElapsedTime = $this.GetElapsed()
-        $D.Results += $D.downloadInfo
-      }
-
-      continue
+    foreach (  $match In $matches) {
+      $url = $match.Matches.Value
+      $url = $url.Substring(0, $url.IndexOf('"'))
+      Write-Host "Do Something with URL =  $url" -ForegroundColor GREEN
+      $D.downloadInfo.ImgURL = $url
+      $D.DownloadImageFromURL()
 
     }
   }
