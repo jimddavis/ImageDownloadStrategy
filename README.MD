@@ -110,9 +110,10 @@ Concrete Stategy class for downloading from Outdoor Photographer RSS Feeds
 
 ### **Write-VerboseColored.psm1**
 
-A simple module that changed the forecolor of the Verbose output stream.
-
+A simple module that allows changing the forecolor of the Verbose output stream so it is not always Yellow.
+```
    Write-VerboseColored 'Your Text'  SystemColor
+```
 
 Allowed colors are Black, Blue, Cyan,  DarkBlue, DarkCyan, Darkgray, DarkMagenta, DarkGreen, DarkRed, DarkYellow,   Gray, Green, Magenta, Red, Yellow, and White.
 
@@ -127,7 +128,7 @@ A simple module for logging errors.  This module is part of the [Efficiency Boos
 
 
 ## **Powershell Version**
-* Minimum Powershell 7.0
+Minimum Powershell 7.0. 	&nbsp;
 This was written in Powershell 7.2 on Windows 11 and not tested on any other platform.
 
 &nbsp;
@@ -158,7 +159,7 @@ Before being able to run this script without using VS Code, you will need to set
 
 	&nbsp;
 
-## **Comments About This Script**
+## **Comments About This Module**
 
 I am a beginner with Powershell and the basis for the code in this module was taken from a variety of other examples on the web, with a fair amount of research to work out problems.  It does not represent best practices.  I looked at a few examples and picked what seemed like a good idea to me!
 
@@ -168,12 +169,12 @@ Then I discovered the Earth Observatory web site, then the Outdoor Photographer 
 
 This was an exercise in getting the pictures, learning a bit about Powershell, setting up a Git repository, and learning to format the README file. I learned a lot.  It has been frustrating and fun and gratifying.  Hopefully someone else finds this useful.
 
-	&nbsp;
 
+&nbsp;
 
 ## Author
 
-Jim Davis: Owner of the [Hummingbird Healing Center](https://hummingbirdhealingcenter.org/)
+Jim Davis: 	&nbsp; Owner of the [Hummingbird Healing Center](https://hummingbirdhealingcenter.org/)
 
 
 
