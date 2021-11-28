@@ -7,12 +7,19 @@ Clear-Host
 
 $img = [ImageDownload]::new()
 
-#$img.AddDownloadType([NasaAPOD]::new('c:\temp'))
-#$img.AddDownloadType([NasaAPOD]::new())
+#$img.AddDownloadType([NasaAPOD]::new('C:\Users\JimD\Pictures\Nasa'))
+#$img.AddDownloadType([EarthObservatoryPOD]::new('C:\Users\JimD\Pictures\EarthObservatory'))
 
-$img.AddDownloadType([EarthObservatoryPOD]::new())
+#$test = [TestEnum]::new([OutdoorPhotoFeedEnum]::FavoritePlaces)
 
-$img.AddDownloadType([OutdoorPhotographer]::new())
+$op = [OutdoorPhotographer]::new([OutdoorPhotoFeedEnum]::FeaturedStories)
+$op.GetEnumVal()
+$op.DownloadFolder = 'C:\Users\JimD\Pictures\OutdoorPhotographer'
+$op.TempFolder = 'C:\temp\OutdoorPhotography'
+
+$img.AddDownloadType($op)
+
+#$img.AddDownloadType([OutdoorPhotographer]::new('C:\Users\JimD\Pictures\OutdoorPhotographer'))
 
 
 if ($img.TestInternetConnection()) {
@@ -22,4 +29,6 @@ if ($img.TestInternetConnection()) {
   $img.Results | Out-File  'c:\temp\ImgDownload.log' -Append
 
 }
+
+
 

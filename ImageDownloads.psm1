@@ -1,6 +1,12 @@
 using module .\WriteErrorLog.ps1
 using module .\Write-VerboseColored.psm1
 
+enum OutdoorPhotoFeedEnum {
+  FavoritePlaces  = 1
+  FeaturedStories = 2
+  Travel          = 3
+}
+
 class DownloadInfo {
 
   [string]   $FeedName
@@ -334,6 +340,7 @@ class EarthObservatoryPOD : DownloadType {
     $outFile = $D.downloadInfo.TempFolder + '\EarthObservatory.rss'
 
     try {
+      if (!(Test-Path $D.downloadInfo.TempFolder)) { mkdir $D.downloadInfo.TempFolder }
       Invoke-RestMethod -Uri $this.RSSFeed -OutFile $outFile
       [xml]$resp = Get-Content -Path C:\temp\EarthObservatory.rss
 
@@ -402,11 +409,17 @@ class EarthObservatoryPOD : DownloadType {
 }
 
 
+
+
 class OutdoorPhotographer : DownloadType {
 
   $RSSFeed = 'https://www.outdoorphotographer.com/on-location/favorite-places/feed/'
   [string] $DownloadFolder
   [string] $TempFolder
+
+  [OutdoorPhotoFeedEnum] $FeedType
+
+
 
   #region Constructors
   OutdoorPhotographer () : base('OutdoorPhotographer') {  }
@@ -423,7 +436,25 @@ class OutdoorPhotographer : DownloadType {
     $this.TempFolder = $tempFolder
 
   }
+
+  OutdoorPhotographer ([OutdoorPhotoFeedEnum] $feedType) : base('OutdoorPhotographer') {
+
+    $this.FeedType = $FeedType
+    switch ($FeedType) {
+      'FavoritePlaces'  { $this.RSSFeed = 'https://www.outdoorphotographer.com/on-location/favorite-places/feed/' }
+      'FeaturedStories' { $this.RSSFeed = 'https://www.outdoorphotographer.com/on-location/featured-stories/feed/' }
+      'Travel'          { $this.RSSFeed = 'https://www.outdoorphotographer.com/on-location/travel/feed/' }
+    }
+
+  }
   #endregion
+
+
+  [string] GetEnumVal () {
+
+    return $this.FeedType
+  }
+
 
   <#
    #  Download RSS feed to local a file then load it into an XML object.
@@ -443,6 +474,7 @@ class OutdoorPhotographer : DownloadType {
     $outFile = $D.downloadInfo.TempFolder + '\OutdoorPhotography.rss'
 
     try {
+      if (!(Test-Path $D.downloadInfo.TempFolder)) { mkdir $D.downloadInfo.TempFolder }
       Invoke-RestMethod -Uri $this.RSSFeed -OutFile $outFile
     }
     catch {
@@ -495,10 +527,9 @@ class OutdoorPhotographer : DownloadType {
       continue
 
     }
-
   }
-
-
 }
+
+
 
 
