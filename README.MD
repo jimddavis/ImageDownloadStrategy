@@ -9,7 +9,7 @@ A Class based module implementing the Strategy pattern to download images from d
 &nbsp;
 
 
-## **Overview of Feeds Used By These Scripts**
+## **Overview of Feeds Used By This Module**
 
 
 ### **NASA Open API**
@@ -19,7 +19,9 @@ The rate limits for the DEMO_KEY are:
 * Hourly Limit: 30 requests per IP address per hour.
 * Daily Limit: 50 requests per IP address per day.
 
-You can [sign up for your own key](https://api.nasa.gov/) to remove those limits
+You can [sign up for your own key](https://api.nasa.gov/) to remove those limits.
+
+This module uses the [NASA APOD Open API](https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY) with the DEMO_KEY.
 
 &nbsp;
 
